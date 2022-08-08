@@ -1,0 +1,17 @@
+[package]
+name = "gitlab-rust-estimation-getter"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "greg"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gitlab = "0.1500.0"
+serde = "1.0.137"
+chrono = "0.4"
+csv = "1.1.6"
+confy = "0.3.1"
