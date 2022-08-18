@@ -1,36 +1,45 @@
-use crate::cli;
+use git_config::File;
+use git_discover::repository::Path;
 use serde::{Deserialize, Serialize};
 use confy;
 
 #[derive(Serialize, Deserialize)]
 pub struct MyConfig {
-    pub version: u8,
-    pub gitlab_url: String,
-    pub api_key: String,
+    version: u8,
+    pub api_urls: Vec<APIUrl>,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct APIUrl {
+    pub api_url: String,
+    pub api_keys: Vec<String>,
+}
+
 
 impl ::std::default::Default for MyConfig {
-    fn default() -> Self { Self { version: 0, gitlab_url: "".into(), api_key: "".into() } }
+    fn default() -> Self { Self { version: 0, api_urls: vec![] } }
 }
 
-pub fn load() -> Result<MyConfig, &'static str> {
-    let mut cfg: MyConfig = confy::load("gitlab-rust-estimation-getter").unwrap();
+pub fn load() -> Result<MyConfig, confy::ConfyError> {
+    let mut cfg: MyConfig = confy::load("greg")?;
 
-    if cfg.gitlab_url.is_empty() {
-        println!("gitlab url is not configured.");
-        cfg.gitlab_url = cli::prompt("enter url", Some("gitlab.com"));
-    }
+    let (path,  _) = git_discover::upwards(".").unwrap();
+    let (repo, _) = path.into_repository_and_work_tree_directories();
 
-    if cfg.api_key.is_empty() {
-        println!("api key is not configured.");
-        cfg.api_key = cli::prompt("enter gitlab api key", None);
-    }
+    
+    println!("{}", repo.into_os_string().into_string().unwrap());
 
-    if cfg.gitlab_url.is_empty() || cfg.api_key.is_empty() {
-        return Err("gitlab url and api key must be provided.");
-    }
+    // let mut local_cfg: MyConfig = confy::load_path()?;
 
-    confy::store("gitlab-rust-estimation-getter", &cfg).unwrap();
 
     return Ok(cfg);
+}
+
+pub fn get_api_url(cfg: MyConfig) -> Option<String> {
+    let (repo, _) = git_discover::upwards(".").unwrap();
+    let (dir, _) = repo.into_repository_and_work_tree_directories();
+    let config: File = git_config::File::from_git_dir(dir).unwrap();
+    let url = config.string("remote", Some("origin"), "url").unwrap();
+
+    return Some(url.to_string());
 }

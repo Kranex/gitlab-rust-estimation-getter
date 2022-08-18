@@ -41,9 +41,9 @@ pub struct TimeStats {
 }
 
 pub fn get_client(cfg: crate::config::MyConfig) -> Result<Gitlab, &'static str> {
-    let client = Gitlab::new(cfg.gitlab_url, cfg.api_key).unwrap();
+    // let client = Gitlab::new(cfg.gitlab_url, cfg.api_key).unwrap();
 
-    return Ok(client);
+    return Err("to be implemented");
 }
 
 pub fn get_current_user(client: &Gitlab) -> Result<User, &'static str> {

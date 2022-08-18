@@ -4,6 +4,19 @@ mod gitlab;
 
 fn main() -> Result<(), &'static str> {
     let cfg = config::load().unwrap();
+    let opts = cli::get_opts();
+
+    match opts.cmd {
+        Some(cmd) => {
+            match cmd {
+                cli::Command::Config { mode: _, global: _ } => {
+                    
+                },
+            }
+        },
+        None => {},
+    }
+
     let client = gitlab::get_client(cfg).unwrap();
     let currentuser = gitlab::get_current_user(&client).unwrap();
 
